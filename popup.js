@@ -1,5 +1,6 @@
 document.getElementById('save').addEventListener('click', () => {
   const info = document.getElementById('info').value;
+  const i = 0;
   if (info) {
     chrome.storage.sync.get('savedInfo', (data) => {
       let savedInfo = data.savedInfo;
