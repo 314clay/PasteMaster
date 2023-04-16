@@ -8,16 +8,22 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedItemIndex = 0;
 
   // Function to update the selection and UI
-  function updateSelection() {
-    const savedInfoItems = savedInfoList.querySelectorAll('li');
-    savedInfoItems.forEach((item, index) => {
-      if (index === selectedItemIndex) {
-        item.classList.add('selected');
-      } else {
-        item.classList.remove('selected');
-      }
-    });
-  }
+function updateSelection() {
+  const savedInfoItems = savedInfoList.querySelectorAll('li');
+  savedInfoItems.forEach((item, index) => {
+    if (index === selectedItemIndex) {
+      item.classList.add('selected');
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          console.log(item.innerText);
+        }
+      });
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+}
+
 
   // Add event listeners for keydown events
   document.addEventListener('keydown', (event) => {
@@ -40,6 +46,22 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedItemIndex++;
         updateSelection();
         break;
+      case 'Enter':
+        const savedInfoItems = savedInfoList.querySelectorAll('li');
+        const selectedItem = savedInfoItems[selectedItemIndex];
+        if (selectedItem) {
+          const selectedText = selectedItem.innerText;
+          // Send a message to the content script to paste the selected text
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.tabs.sendMessage(tabs[0].id, { action: 'pasteText', text: selectedText }, () => {
+              window.close(); // Close the popup after pasting the text
+            });
+          });
+        }
+        break;
+
+
+
     }
   });
 
@@ -110,5 +132,6 @@ updateSelection(); // Update the selection and UI
 });
 
 });
+
 
 
